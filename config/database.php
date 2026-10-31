@@ -1,0 +1,2 @@
+<?php
+return ['default'=>env('DB_CONNECTION','pgsql'),'connections'=>['pgsql'=>['driver'=>'pgsql','host'=>env('DB_HOST','db'),'port'=>env('DB_PORT','5432'),'database'=>env('DB_DATABASE','operixsso'),'username'=>env('DB_USERNAME','root'),'password'=>env('DB_PASSWORD','root'),'charset'=>'utf8','prefix'=>'','prefix_indexes'=>true,'search_path'=>'public','sslmode'=>'prefer'],'sqlite'=>['driver'=>'sqlite','database'=>env('DB_DATABASE',':memory:'),'prefix'=>'','foreign_key_constraints'=>true]],'migrations'=>['table'=>'migrations','update_date_on_publish'=>true]];

@@ -1,26 +1,69 @@
 services:
+  testes:
+    build: .
+    command: ["php", "artisan", "test"]
+    environment:
+      APP_ENV: testing
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+      KEYCLOAK_ISSUER_URI: http://localhost:8080/realms/operix
+
+  app:
+    build:
+      context: .
+      args:
+        COMPOSER_NO_DEV: "1"
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY:-}
+      APP_URL: ${APP_URL:-http://localhost:8081}
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-operixsso}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/opeflow}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-opeflow}
+      KEYCLOAK_ADMIN_REALM: ${KEYCLOAK_ADMIN_REALM:-opeflow}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-opeflow-auth}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:-}
+      KEYCLOAK_ALLOWED_CLIENTS: ${KEYCLOAK_ALLOWED_CLIENTS:-operix-sso}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      CACHE_STORE: ${CACHE_STORE:-file}
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-false}
+    ports:
+      - "8081:80"
+    depends_on:
+      db: {condition: service_healthy}
+      keycloak: {condition: service_started}
   db:
     image: postgres:14-alpine
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-root}
       POSTGRES_USER: ${DB_USERNAME:-root}
-      POSTGRES_DB: ${DB_DATABASE:-operixsso}
-    ports:
-      - 5432:5432
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
+      POSTGRES_DB: ${DB_DATABASE:-opeflow}
+    ports: ["5432:5432"]
+    volumes: ["db-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-root} -d ${DB_DATABASE:-opeflow}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.1
     command: start-dev --import-realm
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
-
+    ports: ["8080:8080"]
+    volumes: ["./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro"]
 volumes:
   db-data:

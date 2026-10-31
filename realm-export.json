@@ -1,112 +1,112 @@
 {
-    "realm": "operix",
-    "enabled": true,
-    "displayName": "Operix SSO",
-    "displayNameHtml": "<b>Operix</b> SSO",
-    "loginTheme": "keycloak",
-    "accountTheme": "keycloak",
-    "adminTheme": "keycloak",
-    "emailTheme": "keycloak",
-    "users": [
+  "realm": "operix",
+  "enabled": true,
+  "displayName": "Operix SSO",
+  "displayNameHtml": "<b>Operix</b> SSO",
+  "loginTheme": "keycloak",
+  "accountTheme": "keycloak",
+  "adminTheme": "keycloak",
+  "emailTheme": "keycloak",
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@operix.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
         {
-            "username": "admin",
-            "enabled": true,
-            "email": "admin@operix.local",
-            "firstName": "Admin",
-            "lastName": "User",
-            "credentials": [
-                {
-                    "type": "password",
-                    "value": "admin123",
-                    "temporary": false
-                }
-            ],
-            "realmRoles": [
-                "admin",
-                "offline_access",
-                "uma_authorization"
-            ],
-            "clientRoles": {
-                "operix-sso": [
-                    "admin"
-                ]
-            }
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin",
+        "offline_access",
+        "uma_authorization"
+      ],
+      "clientRoles": {
+        "operix-sso": [
+          "admin"
+        ]
+      }
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "email": "user@operix.local",
+      "firstName": "Regular",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "user",
+        "offline_access",
+        "uma_authorization"
+      ],
+      "clientRoles": {
+        "operix-sso": [
+          "user"
+        ]
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrator role"
+      },
+      {
+        "name": "user",
+        "description": "Regular user role"
+      }
+    ],
+    "client": {
+      "operix-sso": [
+        {
+          "name": "admin",
+          "description": "Admin role for the API"
         },
         {
-            "username": "user",
-            "enabled": true,
-            "email": "user@operix.local",
-            "firstName": "Regular",
-            "lastName": "User",
-            "credentials": [
-                {
-                    "type": "password",
-                    "value": "user123",
-                    "temporary": false
-                }
-            ],
-            "realmRoles": [
-                "user",
-                "offline_access",
-                "uma_authorization"
-            ],
-            "clientRoles": {
-                "operix-sso": [
-                    "user"
-                ]
-            }
+          "name": "user",
+          "description": "User role for the API"
         }
-    ],
-    "roles": {
-        "realm": [
-            {
-                "name": "admin",
-                "description": "Administrator role"
-            },
-            {
-                "name": "user",
-                "description": "Regular user role"
-            }
-        ],
-        "client": {
-            "operix-sso": [
-                {
-                    "name": "admin",
-                    "description": "Admin role for the API"
-                },
-                {
-                    "name": "user",
-                    "description": "User role for the API"
-                }
-            ]
-        }
-    },
-    "clients": [
-        {
-            "clientId": "operix-sso",
-            "name": "Operix SSO",
-            "description": "Resource server client for the Spring Boot API",
-            "enabled": true,
-            "clientAuthenticatorType": "client-secret",
-            "secret": "",
-            "redirectUris": [],
-            "webOrigins": [],
-            "publicClient": false,
-            "serviceAccountsEnabled": false,
-            "authorizationServicesEnabled": false,
-            "directAccessGrantsEnabled": true,
-            "standardFlowEnabled": false,
-            "implicitFlowEnabled": false,
-            "bearerOnly": false,
-            "consentRequired": false,
-            "protocol": "openid-connect",
-            "attributes": {
-                "access.token.lifespan": "3600",
-                "client.introspection.endpoint": "",
-                "client.secret.creation.time": "1715000000"
-            },
-            "authenticationFlowBindingOverrides": {}
-        }
-    ],
-    "keycloakVersion": "25.0.1"
+      ]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "operix-sso",
+      "name": "Operix SSO",
+      "description": "Cliente confidencial para a API Laravel e sua conta de serviço administrativa.",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "",
+      "redirectUris": [],
+      "webOrigins": [],
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "3600",
+        "client.introspection.endpoint": "",
+        "client.secret.creation.time": "1715000000"
+      },
+      "authenticationFlowBindingOverrides": {}
+    }
+  ],
+  "keycloakVersion": "25.0.1"
 }
