@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ServicoSistemaAplicacao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -18,12 +19,9 @@ class PainelAdministradorController
     public function autenticar(Request $request)
     {
         $dados = $request->validate(['email' => ['required', 'email'], 'senha' => ['required', 'string']]);
-        $emailCorreto = (string) config('painel.email');
-        $senhaCorreta = (string) config('painel.senha');
+        $administrador = DB::table('administradores')->where('email', mb_strtolower(trim($dados['email'])))->first();
 
-        $emailValido = $emailCorreto !== '' && hash_equals($emailCorreto, $dados['email']);
-        $senhaValida = $senhaCorreta !== '' && hash_equals($senhaCorreta, $dados['senha']);
-        if (!$emailValido || !$senhaValida) {
+        if (!$administrador || !Hash::check($dados['senha'], $administrador->senha_hash)) {
             $this->registrarEventoAdministrativo($request, 'security_admin_login_failure', 401);
             throw ValidationException::withMessages(['email' => 'Credenciais administrativas inválidas.']);
         }

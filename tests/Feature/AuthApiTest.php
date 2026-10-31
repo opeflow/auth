@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthApiTest extends TestCase
@@ -166,6 +167,10 @@ class AuthApiTest extends TestCase
     public function test_painel_exige_login_administrativo_e_exibe_guia(): void
     {
         config(['painel.email' => 'admin@example.com', 'painel.senha' => 'senha-painel-teste']);
+        DB::table('administradores')->insert([
+            'nome' => 'Admin Teste', 'email' => 'admin@example.com', 'senha_hash' => Hash::make('senha-painel-teste'),
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
 
         $this->get('/admin')->assertRedirect('/admin/login');
         $this->post('/admin/login', ['email'=>'admin@example.com','senha'=>'senha-errada'])->assertSessionHasErrors('email');
@@ -175,9 +180,27 @@ class AuthApiTest extends TestCase
         $this->get('/admin/guia-keycloak')->assertOk()->assertSee('Service accounts roles');
     }
 
+    public function test_seeder_cria_administrador_com_senha_em_hash_e_pode_ser_reexecutado(): void
+    {
+        config(['painel.nome' => 'Admin Seed', 'painel.email' => 'ADMIN@example.com', 'painel.senha' => 'senha-forte-de-teste']);
+
+        Artisan::call('db:seed', ['--class' => \Database\Seeders\AdministradorSeeder::class, '--force' => true]);
+        Artisan::call('db:seed', ['--class' => \Database\Seeders\AdministradorSeeder::class, '--force' => true]);
+
+        $this->assertDatabaseCount('administradores', 1);
+        $administrador = DB::table('administradores')->first();
+        $this->assertSame('admin@example.com', $administrador->email);
+        $this->assertNotSame('senha-forte-de-teste', $administrador->senha_hash);
+        $this->assertTrue(Hash::check('senha-forte-de-teste', $administrador->senha_hash));
+    }
+
     public function test_nome_de_sistema_nao_e_renderizado_como_html(): void
     {
         config(['painel.email' => 'admin@example.com', 'painel.senha' => 'senha-painel-teste']);
+        DB::table('administradores')->insert([
+            'nome' => 'Admin Teste', 'email' => 'admin@example.com', 'senha_hash' => Hash::make('senha-painel-teste'),
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
         $this->post('/admin/login', ['email'=>'admin@example.com','senha'=>'senha-painel-teste']);
         $this->post('/admin/sistemas', ['nome'=>'<script>alert(1)</script>','slug'=>'app-seguro'])->assertRedirect();
 

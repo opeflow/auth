@@ -16,6 +16,7 @@ services:
         COMPOSER_NO_DEV: "1"
     restart: unless-stopped
     environment:
+      APP_NAME: ${APP_NAME:-Opeflow Auth}
       APP_ENV: ${APP_ENV:-production}
       APP_DEBUG: ${APP_DEBUG:-false}
       APP_KEY: ${APP_KEY:-}
@@ -49,11 +50,12 @@ services:
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-root}
       POSTGRES_USER: ${DB_USERNAME:-root}
-      POSTGRES_DB: ${DB_DATABASE:-opeflow}
-    ports: ["5432:5432"]
+      POSTGRES_DB: ${DB_DATABASE:-operixsso}
+    # Preserve the host PostgreSQL service already bound to 5432.
+    ports: ["${DB_HOST_PORT:-5433}:5432"]
     volumes: ["db-data:/var/lib/postgresql/data"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-root} -d ${DB_DATABASE:-opeflow}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-root} -d ${DB_DATABASE:-operixsso}"]
       interval: 5s
       timeout: 3s
       retries: 10
