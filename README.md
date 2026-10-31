@@ -1,4 +1,4 @@
-# <img width="50" height="50" alt="f9dd8bfa-5d56-4511-aef8-73031ee9558c" src="https://github.com/user-attachments/assets/8d07d11f-79a3-4390-b73c-b4aa2deec9b4" /> Operix Auth
+# Opeflow Auth
 
 Central de autenticação multi sistema construída com Laravel 12 e PHP 8.3. A API cria sistemas isolados, mantém os usuários em tabelas PostgreSQL próprias e emite JWTs vinculados ao sistema. Tokens emitidos pelo Keycloak também continuam aceitos nas rotas protegidas.
 
@@ -17,11 +17,13 @@ docker compose up --build -d
 docker compose exec app php artisan migrate
 ```
 
-A API fica em `http://localhost:8081`, Keycloak em `http://localhost:8080` e PostgreSQL em `localhost:5432`. O realm de `realm-export.json` é importado pelo Keycloak. As chamadas da API usam as credenciais de sistema geradas no painel. Os valores `KEYCLOAK_ADMIN_CLIENT_ID` e `KEYCLOAK_ADMIN_CLIENT_SECRET` são mantidos para integrações administrativas opcionais e validação de tokens emitidos pelo Keycloak.
+A API fica em `http://localhost:8081`, Keycloak em `http://localhost:8080` e PostgreSQL em `localhost:5433` (a porta 5432 do host é preservada). O realm de `realm-export.json` é importado pelo Keycloak. As chamadas da API usam as credenciais de sistema geradas no painel. Os valores `KEYCLOAK_ADMIN_CLIENT_ID` e `KEYCLOAK_ADMIN_CLIENT_SECRET` são mantidos para integrações administrativas opcionais e validação de tokens emitidos pelo Keycloak.
 
 O painel administrativo fica em `http://localhost:8081/admin`. Ele apresenta sistemas conectados, métricas de requisições e falhas, logs recentes, controles para ativar/desativar aplicações e o [guia de integração do Keycloak](./resources/views/admin/guia-keycloak.blade.php).
 
 ## Endpoints
+
+O Swagger está em [`/api/swagger`](http://localhost:8081/api/swagger) e o documento OpenAPI em [`/api/swagger.json`](http://localhost:8081/api/swagger.json). A especificação é montada a partir das rotas da API, validadores de entrada e tipos inferidos do código usando Scramble; novas rotas `api/*` entram na documentação sem manter uma lista duplicada. Por segurança, a UI é liberada por padrão somente no ambiente local.
 
 | Método | Caminho | Acesso | Descrição |
 | --- | --- | --- | --- |
@@ -53,7 +55,7 @@ Rotas privadas exigem `Authorization: Bearer <access_token>` emitido pelo realm 
 docker compose run --rm testes
 ```
 
-Os testes de feature cobrem validação, isolamento dos usuários entre sistemas, emissão e validação dos JWTs e proteção do painel administrativo.
+Os testes de feature cobrem validação, isolamento dos usuários entre sistemas, emissão e validação dos JWTs e proteção do painel administrativo. O banco PostgreSQL de testes é criado e removido pelo Testcontainers a cada execução da suíte. O serviço `testes` precisa acessar o daemon Docker pelo socket `/var/run/docker.sock`; `docker compose run --rm testes` configura esse acesso automaticamente.
 
 
 ## Banco

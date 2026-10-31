@@ -194,6 +194,21 @@ class AuthApiTest extends TestCase
         $this->assertTrue(Hash::check('senha-forte-de-teste', $administrador->senha_hash));
     }
 
+    public function test_swagger_exibe_especificacao_gerada_a_partir_das_rotas_da_api(): void
+    {
+        app()->detectEnvironment(fn (): string => 'local');
+
+        $documento = $this->get('/api/swagger.json')->assertOk()
+            ->assertJsonPath('info.title', 'Opeflow Auth API')
+            ->assertJsonStructure(['openapi', 'paths']);
+        $this->assertArrayHasKey('/v1/auth/login', $documento->json('paths'));
+        $this->assertArrayNotHasKey('/swagger', $documento->json('paths'));
+        $headersLogin = collect($documento->json('paths./v1/auth/login.post.parameters'))->pluck('name');
+        $this->assertContains('X-Client-Id', $headersLogin);
+        $this->assertContains('X-Client-Secret', $headersLogin);
+        $this->get('/api/swagger')->assertOk();
+    }
+
     public function test_nome_de_sistema_nao_e_renderizado_como_html(): void
     {
         config(['painel.email' => 'admin@example.com', 'painel.senha' => 'senha-painel-teste']);

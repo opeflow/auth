@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\HeaderParameter;
 use App\Services\ServicoSistemaAplicacao;
 use App\Services\ServicoTokenCentral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+#[Group('Autenticação')]
 class AutenticacaoController
 {
+    /** Cria um usuário dentro do sistema integrado identificado pelos cabeçalhos do cliente. */
+    #[HeaderParameter('X-Client-Id', description: 'Identificador público do sistema cadastrado no painel.', type: 'string', required: true)]
+    #[HeaderParameter('X-Client-Secret', description: 'Segredo do sistema integrado. Nunca compartilhe este valor.', type: 'string', required: true)]
     public function registrar(Request $request, ServicoSistemaAplicacao $sistemas)
     {
         $data = Validator::make($request->all(), [
@@ -20,6 +26,9 @@ class AutenticacaoController
         return response()->json(['status'=>'success','message'=>'Usuário criado com sucesso','data'=>null]);
     }
 
+    /** Autentica um usuário no sistema integrado e retorna um token de acesso. */
+    #[HeaderParameter('X-Client-Id', description: 'Identificador público do sistema cadastrado no painel.', type: 'string', required: true)]
+    #[HeaderParameter('X-Client-Secret', description: 'Segredo do sistema integrado. Nunca compartilhe este valor.', type: 'string', required: true)]
     public function entrar(Request $request, ServicoSistemaAplicacao $sistemas, ServicoTokenCentral $tokens)
     {
         $data = Validator::make($request->all(), [
