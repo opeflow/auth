@@ -1,4 +1,4 @@
-# Operix Auth API
+# <img width="1254" height="1254" alt="f9dd8bfa-5d56-4511-aef8-73031ee9558c" src="https://github.com/user-attachments/assets/8d07d11f-79a3-4390-b73c-b4aa2deec9b4" /> Operix Auth
 
 Central de autenticação multi sistema construída com Laravel 12 e PHP 8.3. A API cria sistemas isolados, mantém os usuários em tabelas PostgreSQL próprias e emite JWTs vinculados ao sistema. Tokens emitidos pelo Keycloak também continuam aceitos nas rotas protegidas.
 
